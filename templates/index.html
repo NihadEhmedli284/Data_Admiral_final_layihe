@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Admiral</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #00f3ff;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: #020617;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            border-color: #00f3ff;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #00f3ff, #0077ff);
+            border: none;
+            border-radius: 6px;
+            color: #020617;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .message-box {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-text {
+            color: #00ff66;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .warning-text {
+            color: #ffaa00;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Data Admiral</h2>
+        <div class="subtitle">MƏKTƏBLİLƏRİN BOŞ VAXT ANALİTİKASI</div>
+
+        <div id="content">
+     
+        </div>
+    </div>
+
+    <script>
+        const contentDiv = document.getElementById('content');
+
+
+        if (localStorage.getItem('submitted') === 'true') {
+            contentDiv.innerHTML = `
+                <div class="message-box">
+                    <div class="warning-text"> Yalnız 1 dəfə göndərmək olur!</div>
+                    <p style="color: #94a3b8; margin-top: 10px;">Siz artıq əvvəl bu formanı doldurmusunuz və məlumatınız qeydə alınıb.</p>
+                </div>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <form id="dataForm" action="/submit" method="POST">
+                    <div class="form-group">
+                        <label>Yaşınız (6 - 18):</label>
+                        <input type="number" name="age" min="6" max="18" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sinfiniz (1 - 11):</label>
+                        <input type="number" name="grade" min="1" max="11" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ən çox boş vaxt olan gün:</label>
+                        <select name="free_day" required>
+                            <option value="">Seçin...</option>
+                            <option value="Bazar ertəsi">Bazar ertəsi</option>
+                            <option value="Çərşənbə axşamı">Çərşənbə axşamı</option>
+                            <option value="Çərşənbə">Çərşənbə</option>
+                            <option value="Cümə axşamı">Cümə axşamı</option>
+                            <option value="Cümə">Cümə</option>
+                            <option value="Şənbə">Şənbə</option>
+                            <option value="Bazar">Bazar</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Əsas məşğuliyyət sahəsi:</label>
+                        <select name="activity" required>
+                            <option value="">Seçin...</option>
+                            <option value="Kitab oxumaq">Kitab oxumaq</option>
+                            <option value="İdman">İdman</option>
+                            <option value="Oyun oynamaq">Oyun oynamaq</option>
+                            <option value="Gəzmək">Gəzmək</option>
+                            <option value="Musiqi">Musiqi</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Bu fəaliyyəti kimlərlə edirsiniz?</label>
+                        <select name="companion" required>
+                            <option value="">Seçin...</option>
+                            <option value="Tək başına">Tək başına</option>
+                            <option value="Ailə üzvü">Ailə üzvü</option>
+                            <option value="Dostlarla">Dostlarla</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gün ərzində sərf edilən saat (0 - 12):</label>
+                        <input type="number" step="0.5" name="hours_per_day" min="0" max="12" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Məmnuniyyət dərəcəsi (1 - 5):</label>
+                        <select name="satisfaction_rating" required>
+                            <option value="">Seçin...</option>
+                            <option value="5 - Çox razıyam">5 - Çox razıyam</option>
+                            <option value="4 - Razıyam">4 - Razıyam</option>
+                            <option value="3 - Orta">3 - Orta</option>
+                            <option value="2 - Narazıyam">2 - Narazıyam</option>
+                            <option value="1 - Çox narazıyam">1 - Çox narazıyam</option>
+                        </select>
+                    </div>
+
+                    <button type="submit">Məlumatı Göndər</button>
+                </form>
+            `;
+
+            // Form göndəriləndə işləyən hissə
+            const form = document.getElementById('dataForm');
+            form.addEventListener('submit', function(e) {
+                // Brauzerin yaddaşına qeyd edirik ki, artıq göndərilib
+                localStorage.setItem('submitted', 'true');
+            });
+        }
+    </script>
+</body>
+</html>
