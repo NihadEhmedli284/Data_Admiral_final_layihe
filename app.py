@@ -19,30 +19,38 @@ def index():
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
-        age = request.form['age']
-        grade = request.form['grade']
-        free_day = request.form['free_day']
-        activity = request.form['activity']
-        companion = request.form['companion']
-        hours_per_day = request.form['hours_per_day']
+        age = request.form.get('age')
+        grade = request.form.get('grade')
+        free_day = request.form.get('free_day')
+        activity = request.form.get('activity')
+        companion = request.form.get('companion')
+        hours_per_day = request.form.get('hours_per_day')
         satisfaction = request.form.get('satisfaction') or request.form.get('satisfaction_rating')
 
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute(
-            "INSERT INTO activities (activity_name) VALUES (%s) ON CONFLICT (activity_name) DO NOTHING;",
-            (activity,)
-        )
-        cur.execute("SELECT activity_id FROM activities WHERE activity_name = %s;", (activity,))
-        activity_id = cur.fetchone()[0]
+        cur.execute("SELECT id FROM activities WHERE name = %s;", (activity,))
+        row = cur.fetchone()
+        if row:
+            activity_id = row[0]
+        else:
+            cur.execute(
+                "INSERT INTO activities (name) VALUES (%s) RETURNING id;",
+                (activity,)
+            )
+            activity_id = cur.fetchone()[0]
 
-        cur.execute(
-            "INSERT INTO companions (companion_type) VALUES (%s) ON CONFLICT (companion_type) DO NOTHING;",
-            (companion,)
-        )
-        cur.execute("SELECT companion_id FROM companions WHERE companion_type = %s;", (companion,))
-        companion_id = cur.fetchone()[0]
+        cur.execute("SELECT id FROM companions WHERE name = %s;", (companion,))
+        row = cur.fetchone()
+        if row:
+            companion_id = row[0]
+        else:
+            cur.execute(
+                "INSERT INTO companions (name) VALUES (%s) RETURNING id;",
+                (companion,)
+            )
+            companion_id = cur.fetchone()[0]
 
         cur.execute(
             """
