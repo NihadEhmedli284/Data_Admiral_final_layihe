@@ -1,14 +1,16 @@
+import os
 from flask import Flask, render_template, request, redirect
 import psycopg2
 
 app = Flask(__name__)
 
-
-DB_URL = "postgresql://neondb_owner:npg_gT14sxhLojPD@ep-restless-bird-a23w9w2e-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+DB_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://neondb_owner:npg_umVILGU1h5yj@ep-solitary-violet-baw40ho1-pooler.c-8.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+)
 
 def get_db_connection():
-    conn = psycopg2.connect(DB_URL)
-    return conn
+    return psycopg2.connect(DB_URL)
 
 @app.route('/')
 def index():
@@ -23,7 +25,7 @@ def submit():
         activity = request.form['activity']
         companion = request.form['companion']
         hours_per_day = request.form['hours_per_day']
-        satisfaction_rating = request.form['satisfaction_rating']
+        satisfaction = request.form.get('satisfaction') or request.form.get('satisfaction_rating')
 
         conn = get_db_connection()
         cur = conn.cursor()
@@ -44,10 +46,10 @@ def submit():
 
         cur.execute(
             """
-            INSERT INTO responses (age, grade, free_day, activity_id, companion_id, hours_per_day, satisfaction_rating)
+            INSERT INTO responses (age, grade, free_day, activity_id, companion_id, hours_per_day, satisfaction)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (age, grade, free_day, activity_id, companion_id, hours_per_day, satisfaction_rating)
+            (age, grade, free_day, activity_id, companion_id, hours_per_day, satisfaction)
         )
 
         conn.commit()
@@ -55,7 +57,7 @@ def submit():
         conn.close()
 
         return redirect('/')
-    
+
     except Exception as e:
         return f"Xəta baş verdi: {e}"
 
