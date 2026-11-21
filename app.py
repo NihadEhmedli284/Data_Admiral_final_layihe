@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, request, redirect
 import psycopg2
 
@@ -12,6 +13,12 @@ DB_URL = os.environ.get(
 def get_db_connection():
     return psycopg2.connect(DB_URL)
 
+def parse_int(value, default=None):
+    if value is None:
+        return default
+    match = re.search(r"-?\d+", str(value))
+    return int(match.group()) if match else default
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -19,13 +26,14 @@ def index():
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
-        age = request.form.get('age')
-        grade = request.form.get('grade')
+        age = parse_int(request.form.get('age'))
+        grade = parse_int(request.form.get('grade'))
         free_day = request.form.get('free_day')
         activity = request.form.get('activity')
         companion = request.form.get('companion')
         hours_per_day = request.form.get('hours_per_day')
-        satisfaction = request.form.get('satisfaction') or request.form.get('satisfaction_rating')
+        raw_satisfaction = request.form.get('satisfaction') or request.form.get('satisfaction_rating')
+        satisfaction = parse_int(raw_satisfaction)
 
         conn = get_db_connection()
         cur = conn.cursor()
