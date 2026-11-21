@@ -30,17 +30,19 @@ def submit():
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # activities cədvəli: id, name, category
         cur.execute("SELECT id FROM activities WHERE name = %s;", (activity,))
         row = cur.fetchone()
         if row:
             activity_id = row[0]
         else:
             cur.execute(
-                "INSERT INTO activities (name) VALUES (%s) RETURNING id;",
-                (activity,)
+                "INSERT INTO activities (name, category) VALUES (%s, %s) RETURNING id;",
+                (activity, 'Digər')
             )
             activity_id = cur.fetchone()[0]
 
+        # companions cədvəli: id, name
         cur.execute("SELECT id FROM companions WHERE name = %s;", (companion,))
         row = cur.fetchone()
         if row:
@@ -52,6 +54,7 @@ def submit():
             )
             companion_id = cur.fetchone()[0]
 
+        # responses cədvəlinə əlavə etmə
         cur.execute(
             """
             INSERT INTO responses (age, grade, free_day, activity_id, companion_id, hours_per_day, satisfaction)
